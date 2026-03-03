@@ -1,0 +1,52 @@
+# ============================================================
+#  FSM Core Parameters — TurtleBot3 Waffle Food Delivery
+#  All distance units: meters | All time units: seconds
+# ============================================================
+
+fsm:
+  # ── State machine loop rate ──────────────────────────────
+  loop_rate_hz: 10                  # Timer fires every 0.1s
+
+  # ── Obstacle detection (RPLIDAR A1M8) ───────────────────
+  obstacle_threshold: 0.50          # Trigger avoidance when dist < 0.5m
+  scan_angle_min_deg: -180.0        # Full 360° scan coverage (left half)
+  scan_angle_max_deg:  180.0        # Full 360° scan coverage (right half)
+  lidar_min_valid_range: 0.12       # A1M8 hardware minimum (discard closer)
+  lidar_max_valid_range: 12.0       # A1M8 hardware maximum (discard farther)
+
+  # ── Obstacle clearance (Avoiding → Delivering) ──────────
+  clear_duration: 2.0               # Must be clear for 2 consecutive seconds
+
+  # ── Goal arrival tolerance (Delivering → Task Completed) ─
+  goal_tolerance_xy: 0.10           # Position error threshold (m)
+  goal_tolerance_yaw_deg: 5.0       # Yaw error threshold (degrees)
+
+  # ── Speed profile ────────────────────────────────────────
+  delivery_speed: 0.15              # Normal delivery linear speed (m/s)
+  avoidance_speed: 0.05             # Reduced speed during avoidance (m/s)
+  avoidance_angular_speed: 0.40     # Angular speed for turning (rad/s)
+
+  # ── Navigation timeout ───────────────────────────────────
+  nav_goal_timeout: 120.0           # Abort navigation if not reached in 120s
+  avoidance_timeout: 30.0           # Abort avoidance if stuck for 30s
+
+  # ── Topics ───────────────────────────────────────────────
+  topics:
+    scan:            "/scan"
+    cmd_vel:         "/cmd_vel"
+    amcl_pose:       "/amcl_pose"
+    robot_state:     "/robot_state"
+    delivery_task:   "/delivery_task"
+    finish_task:     "/finish_task"
+    obstacle_status: "/obstacle_status"
+    nav_goal:        "/nav_goal"
+
+  # ── Pre-defined delivery locations (map frame, meters) ───
+  # Format: [x, y, yaw_degrees]
+  locations:
+    kitchen:  [0.0,   0.0,   0.0]
+    table_1:  [3.0,   2.0,   0.0]
+    table_2:  [3.0,  -2.0,   0.0]
+    table_3:  [6.0,   0.0,  90.0]
+    table_4:  [6.0,   3.0, -90.0]
+    table_5:  [8.0,  -1.5, 180.0]

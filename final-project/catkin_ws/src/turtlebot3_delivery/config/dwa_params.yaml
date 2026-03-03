@@ -1,0 +1,49 @@
+# ============================================================
+#  DWA Local Planner Parameters — TurtleBot3 Waffle
+#  Tuned for food delivery: smooth motion + 0.5m avoidance
+# ============================================================
+
+DWAPlannerROS:
+
+  # ── Robot kinematic constraints (Waffle hardware limits) ──
+  max_vel_x:   0.15                 # Delivery speed cap (m/s); avoidance uses 0.05
+  min_vel_x:  -0.05                 # Allow very slow reverse for tight spots
+  max_vel_y:   0.0                  # Non-holonomic: no lateral motion
+  min_vel_y:   0.0
+
+  max_vel_trans: 0.15               # Maximum translational speed (m/s)
+  min_vel_trans: 0.02               # Minimum moving speed (avoid stall)
+  max_vel_theta: 0.40               # Maximum rotational speed (rad/s)
+  min_vel_theta: 0.10               # Minimum rotation to avoid jitter
+
+  acc_lim_x:     0.5               # Linear acceleration limit (m/s²)
+  acc_lim_y:     0.0               # No lateral acceleration
+  acc_lim_theta: 1.0               # Angular acceleration limit (rad/s²)
+
+  # ── Goal tolerances ──────────────────────────────────────
+  xy_goal_tolerance:  0.10          # 0.1m position tolerance (matches fsm_params)
+  yaw_goal_tolerance: 0.0873        # 5° yaw tolerance in radians
+  latch_xy_goal_tolerance: false    # Recheck tolerance each iteration
+
+  # ── DWA simulation parameters ────────────────────────────
+  sim_time:       1.5               # Forward simulation time (seconds)
+  sim_granularity: 0.025            # Step size for trajectory simulation (m)
+  angular_sim_granularity: 0.025    # Angular step size (rad)
+  vx_samples:     10                # Linear velocity samples
+  vy_samples:     1                 # No lateral samples (differential drive)
+  vtheta_samples: 20                # Angular velocity samples
+
+  # ── Scoring weights ──────────────────────────────────────
+  path_distance_bias:  32.0         # Stay close to global path
+  goal_distance_bias:  20.0         # Progress toward goal
+  occdist_scale:       0.05         # Penalize proximity to obstacles
+  forward_point_distance: 0.325     # Forward look-ahead for scoring
+
+  # ── Oscillation prevention ───────────────────────────────
+  oscillation_reset_dist:  0.05     # Reset oscillation flag after 5cm motion
+  oscillation_reset_angle: 0.2      # Reset after 0.2rad rotation
+
+  # ── Detour path recovery ─────────────────────────────────
+  # These settings help DWA plan valid detour paths within 0.5m safety zone
+  use_dwa: true
+  restore_defaults: false

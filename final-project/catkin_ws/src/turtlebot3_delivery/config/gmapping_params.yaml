@@ -1,0 +1,65 @@
+# ============================================================
+#  gmapping_params.yaml — SLAM Mapping Parameters
+#  Hardware: RPLIDAR A1M8 on TurtleBot3 Waffle
+#  Tuned for indoor restaurant environment (≤15m x ≤15m)
+# ============================================================
+
+# ── Coordinate frames ─────────────────────────────────────────
+base_frame:  base_footprint   # Robot base frame
+odom_frame:  odom             # Odometry frame
+map_frame:   map              # Output map frame
+
+# ── RPLIDAR A1M8 range limits ─────────────────────────────────
+# A1M8 spec: 0.15m–12m, reliable indoor range ~6m
+maxUrange:  6.0    # Use readings up to 6m for map update
+maxRange:   12.0   # Discard readings beyond 12m
+
+# ── Scan matching quality ─────────────────────────────────────
+# sigma:   standard deviation of laser beam endpoint (m)
+# lstep:   linear scan matching step (m)
+# astep:   angular scan matching step (rad)
+sigma:       0.05
+kernelSize:  1
+lstep:       0.05
+astep:       0.05
+iterations:  5       # ICP iterations per scan
+
+# ── Noise model ───────────────────────────────────────────────
+lsigma:  0.075
+ogain:   3.0
+lskip:   0          # Process every scan (0 = no skip)
+
+# ── Motion update thresholds (when to trigger map update) ────
+linearUpdate:    0.1    # Update map every 10cm of linear motion
+angularUpdate:   0.1    # Update map every ~5.7° of rotation
+temporalUpdate:  3.0    # Force update every 3 seconds if not moving
+
+# ── Particle filter settings ─────────────────────────────────
+# More particles = better accuracy, higher CPU
+resampleThreshold: 0.5
+particles:         100    # 100 particles sufficient for 15x15m room
+
+# ── Odometry noise model (differential drive) ─────────────────
+# srr/srt: rotation noise from rotation/translation
+# str/stt: translation noise from rotation/translation
+srr: 0.1
+srt: 0.2
+str: 0.1
+stt: 0.2
+
+# ── Map dimensions and resolution ─────────────────────────────
+# Covers a 20m x 20m restaurant (adjust if larger)
+xmin:   -10.0   # Map left boundary (m)
+ymin:   -10.0   # Map bottom boundary (m)
+xmax:    10.0   # Map right boundary (m)
+ymax:    10.0   # Map top boundary (m)
+delta:   0.05   # Grid cell size = 5cm (standard for indoor)
+
+# ── Likelihood field parameters ───────────────────────────────
+llsamplerange:    0.01
+llsamplestep:     0.01
+lasamplerange:    0.005
+lasamplestep:     0.005
+
+# ── Map publish rate ──────────────────────────────────────────
+map_update_interval: 2.0   # Publish updated map every 2 seconds

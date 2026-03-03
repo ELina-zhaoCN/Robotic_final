@@ -1,0 +1,101 @@
+<!-- ============================================================
+     delivery_fsm.launch — ONE-CLICK Food Delivery System
+     
+     Launches the complete delivery stack:
+       1. navigation.launch (AMCL + move_base)
+       2. obstacle_detector.py
+       3. navigation_control.py
+       4. task_manager.py
+       5. fsm_core.py (main FSM controller)
+     
+     Prerequisites:
+       - Map already built with mapping.launch
+       - TurtleBot3 bringup already running (or set bringup:=true)
+     
+     Usage:
+       roslaunch turtlebot3_delivery delivery_fsm.launch \
+         map_file:=$HOME/maps/restaurant_map.yaml
+     
+     Send a delivery task after launch:
+       rostopic pub /delivery_task std_msgs/String "data: 'table_1'"
+     ============================================================ -->
+<launch>
+  <!-- ── Top-level arguments ──────────────────────────────── -->
+  <arg name="model"      default="waffle"/>
+  <arg name="map_file"   default="$(env HOME)/maps/restaurant_map.yaml"/>
+  <arg name="open_rviz"  default="true"/>
+  <arg name="bringup"    default="false"
+       doc="Set true if TurtleBot3 bringup not already running"/>
+
+  <!-- ── Optional TurtleBot3 bringup ─────────────────────── -->
+  <group if="$(arg bringup)">
+    <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch"/>
+  </group>
+
+  <!-- ── Navigation stack ─────────────────────────────────── -->
+  <include file="$(find turtlebot3_delivery)/launch/navigation.launch">
+    <arg name="model"     value="$(arg model)"/>
+    <arg name="map_file"  value="$(arg map_file)"/>
+    <arg name="open_rviz" value="$(arg open_rviz)"/>
+  </include>
+
+  <!-- ── Load FSM parameters ──────────────────────────────── -->
+  <rosparam file="$(find turtlebot3_delivery)/config/fsm_params.yaml"
+            command="load"/>
+
+  <!-- ── obstacle_detector.py ─────────────────────────────── 
+       Subscribes: /scan
+       Publishes:  /obstacle_status (RobotState obstacle fields)
+       Rate:       100Hz (parses scan every 10ms) -->
+  <node pkg="turtlebot3_delivery" type="obstacle_detector.py"
+        name="obstacle_detector" output="screen" respawn="true">
+    <param name="obstacle_threshold"   value="0.50"/>
+    <param name="scan_angle_min_deg"   value="-180.0"/>
+    <param name="scan_angle_max_deg"   value=" 180.0"/>
+    <param name="lidar_min_valid_range" value="0.12"/>
+    <param name="lidar_max_valid_range" value="12.0"/>
+  </node>
+
+  <!-- ── navigation_control.py ────────────────────────────── 
+       Subscribes: /amcl_pose, /nav_goal
+       Publishes:  /cmd_vel, move_base ActionGoal
+       Rate:       10Hz -->
+  <node pkg="turtlebot3_delivery" type="navigation_control.py"
+        name="navigation_control" output="screen" respawn="true">
+    <param name="delivery_speed"       value="0.15"/>
+    <param name="avoidance_speed"      value="0.05"/>
+    <param name="goal_tolerance_xy"    value="0.10"/>
+    <param name="goal_tolerance_yaw_deg" value="5.0"/>
+    <param name="nav_goal_timeout"     value="120.0"/>
+  </node>
+
+  <!-- ── task_manager.py ───────────────────────────────────── 
+       Subscribes: /delivery_task
+       Publishes:  /nav_goal, /finish_task
+       Rate:       10Hz -->
+  <node pkg="turtlebot3_delivery" type="task_manager.py"
+        name="task_manager" output="screen" respawn="true"/>
+
+  <!-- ── fsm_core.py (MAIN FSM CONTROLLER) ────────────────── 
+       Subscribes: /obstacle_status, /amcl_pose, /delivery_task
+       Publishes:  /robot_state, /cmd_vel, /finish_task
+       Rate:       10Hz (rospy.Timer 0.1s) -->
+  <node pkg="turtlebot3_delivery" type="fsm_core.py"
+        name="fsm_core" output="screen" required="true">
+    <param name="loop_rate_hz"         value="10"/>
+    <param name="obstacle_threshold"   value="0.50"/>
+    <param name="clear_duration"       value="2.0"/>
+    <param name="goal_tolerance_xy"    value="0.10"/>
+    <param name="goal_tolerance_yaw_deg" value="5.0"/>
+    <param name="delivery_speed"       value="0.15"/>
+    <param name="avoidance_speed"      value="0.05"/>
+    <param name="nav_goal_timeout"     value="120.0"/>
+    <param name="avoidance_timeout"    value="30.0"/>
+  </node>
+
+  <!-- ── rosout logging ───────────────────────────────────── -->
+  <node pkg="rosbag" type="record" name="rosbag_record"
+        args="-o /tmp/delivery_session
+              /robot_state /scan /amcl_pose /cmd_vel /finish_task"
+        output="screen"/>
+</launch>

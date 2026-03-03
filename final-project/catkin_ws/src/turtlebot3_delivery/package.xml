@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>turtlebot3_delivery</name>
+  <version>1.0.0</version>
+  <description>
+    FSM-based food delivery robot controller for TurtleBot3 Waffle.
+    Fuses RPLIDAR A1M8 obstacle detection with SLAM navigation for
+    autonomous restaurant delivery with 0.5m obstacle avoidance.
+  </description>
+
+  <maintainer email="robot@example.com">TurtleBot3 Delivery Team</maintainer>
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- ROS core -->
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>actionlib</depend>
+  <depend>actionlib_msgs</depend>
+  <depend>tf</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>message_runtime</depend>
+
+  <!-- Navigation stack -->
+  <depend>move_base_msgs</depend>
+  <depend>move_base</depend>
+  <depend>amcl</depend>
+  <depend>gmapping</depend>
+  <depend>map_server</depend>
+
+  <!-- TurtleBot3 drivers -->
+  <depend>turtlebot3_bringup</depend>
+  <depend>turtlebot3_navigation</depend>
+
+  <!-- Custom message generation -->
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+
+  <export></export>
+</package>

@@ -1,0 +1,60 @@
+# ============================================================
+#  costmap_common_params.yaml — Shared Costmap Configuration
+#  Loaded by BOTH global_costmap and local_costmap in move_base
+#
+#  CRITICAL: inflation_radius = 0.50m everywhere
+#            This matches the FSM obstacle_threshold exactly.
+# ============================================================
+
+# ── Robot footprint (TurtleBot3 Waffle physical dimensions) ──
+# Waffle body: 281mm (W) x 306mm (D), conservative rectangular footprint
+footprint: [[-0.105, -0.105], [-0.105, 0.105], [0.041, 0.105], [0.041, -0.105]]
+# Alternative: use robot_radius for circular approximation
+# robot_radius: 0.17
+
+# ── Obstacle detection source ─────────────────────────────────
+obstacle_range:  2.5    # Mark cells as obstacles if seen within 2.5m
+raytrace_range:  3.0    # Clear free space up to 3.0m along ray
+
+# ── Costmap layers ─────────────────────────────────────────────
+# static_layer:   loads the pre-built map (from map_server)
+# obstacle_layer: marks real-time obstacles from /scan
+# inflation_layer: expands obstacles by 0.5m safety buffer
+plugins:
+  - {name: static_layer,    type: "costmap_2d::StaticLayer"}
+  - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
+  - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+
+# ── Static layer: the saved restaurant map ────────────────────
+static_layer:
+  map_topic:           /map
+  subscribe_to_updates: true
+  enabled:             true
+
+# ── Obstacle layer: real-time RPLIDAR A1M8 input ─────────────
+obstacle_layer:
+  enabled:             true
+  observation_sources: laser_scan_sensor
+
+  laser_scan_sensor:
+    sensor_frame:       base_scan        # LiDAR TF frame on Waffle
+    data_type:          LaserScan
+    topic:              /scan
+    marking:            true             # Add obstacles
+    clearing:           true             # Remove stale obstacles
+    min_obstacle_height: 0.0
+    max_obstacle_height: 2.0
+    obstacle_range:     2.5
+    raytrace_range:     3.0
+    inf_is_valid:       false
+
+# ── Inflation layer: 0.5m safety bubble around all obstacles ──
+# THIS VALUE MUST MATCH fsm_params.yaml: obstacle_threshold: 0.50
+inflation_layer:
+  enabled:              true
+  inflation_radius:     0.50    # ← 0.5m — DO NOT CHANGE
+  cost_scaling_factor:  3.0     # Exponential decay from obstacle edge
+  # cost at distance d: 253 * e^(-3.0 * (d - robot_radius))
+
+# ── Update rates ──────────────────────────────────────────────
+transform_tolerance: 0.5   # Allow 0.5s TF delay before error
