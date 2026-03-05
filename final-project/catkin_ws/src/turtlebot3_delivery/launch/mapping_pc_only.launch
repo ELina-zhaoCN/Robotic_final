@@ -1,33 +1,24 @@
 <!-- ============================================================
-     mapping.launch — SLAM Mapping with gmapping
-     Run this FIRST to build the restaurant map.
+     mapping_pc_only.launch — 仅在电脑上跑 gmapping + RViz（真机建图用）
+     机器人已在另一台机器上运行 turtlebot3_robot.launch，本机只做 SLAM 和显示。
      
-     Usage:
-       roslaunch turtlebot3_delivery mapping.launch
-     Then drive the robot around with:
-       rosrun teleop_twist_keyboard teleop_twist_keyboard.py
-     Save the map with:
-       rosrun map_server map_saver -f ~/maps/restaurant_map
+     Usage (真机时):
+       机器人: roslaunch turtlebot3_bringup turtlebot3_robot.launch
+       本机:   roslaunch turtlebot3_delivery mapping_pc_only.launch
      ============================================================ -->
 <launch>
-  <!-- ── Robot model ──────────────────────────────────────── -->
   <arg name="model" default="waffle" doc="TurtleBot3 model: burger|waffle|waffle_pi"/>
   <param name="robot_description"
          command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro"/>
 
-  <!-- ── TurtleBot3 hardware bringup ─────────────────────── -->
-  <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch"/>
+  <!-- 不启动 turtlebot3_robot.launch，/scan 和 /odom 由机器人端发布 -->
 
-  <!-- ── gmapping SLAM node ──────────────────────────────── -->
   <node pkg="gmapping" type="slam_gmapping" name="turtlebot3_slam_gmapping"
         output="screen">
-    <!-- LiDAR source -->
     <param name="base_frame"  value="base_footprint"/>
     <param name="odom_frame"  value="odom"/>
     <param name="map_frame"   value="map"/>
-
-    <!-- RPLIDAR A1M8 specific tuning -->
-    <param name="maxUrange"   value="3.5"/>            <!-- A1M8 reliable range -->
+    <param name="maxUrange"   value="3.5"/>
     <param name="maxRange"    value="12.0"/>
     <param name="sigma"       value="0.05"/>
     <param name="kernelSize"  value="1"/>
@@ -37,8 +28,6 @@
     <param name="lsigma"      value="0.075"/>
     <param name="ogain"       value="3.0"/>
     <param name="lskip"       value="0"/>
-
-    <!-- Map quality -->
     <param name="srr"         value="0.1"/>
     <param name="srt"         value="0.2"/>
     <param name="str"         value="0.1"/>
@@ -48,22 +37,18 @@
     <param name="temporalUpdate" value="3.0"/>
     <param name="resampleThreshold" value="0.5"/>
     <param name="particles"   value="100"/>
-
-    <!-- Map dimensions -->
     <param name="xmin"  value="-10.0"/>
     <param name="ymin"  value="-10.0"/>
     <param name="xmax"  value="10.0"/>
     <param name="ymax"  value="10.0"/>
-    <param name="delta" value="0.05"/>            <!-- 5cm resolution -->
+    <param name="delta" value="0.05"/>
   </node>
 
-  <!-- ── Robot state publisher ───────────────────────────── -->
   <node pkg="robot_state_publisher" type="robot_state_publisher"
         name="robot_state_publisher">
     <param name="publish_frequency" value="50.0"/>
   </node>
 
-  <!-- ── RViz for mapping visualization ──────────────────── -->
   <node pkg="rviz" type="rviz" name="rviz"
         args="-d $(find turtlebot3_slam)/rviz/turtlebot3_slam.rviz"/>
 </launch>
