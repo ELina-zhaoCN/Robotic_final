@@ -1,0 +1,2 @@
+# GUI (ROS 2 Nav2)
+customtkinter>=5.0.0

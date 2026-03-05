@@ -9,7 +9,7 @@
 <launch>
   <!-- ── Arguments ────────────────────────────────────────── -->
   <arg name="model"    default="waffle"/>
-  <arg name="map_file" default="$(env HOME)/maps/restaurant_map.yaml"/>
+  <arg name="map_file" default="$(find turtlebot3_delivery)/../../../maps/restaurant_map.yaml"/>
   <arg name="open_rviz" default="true"/>
 
   <!-- ── Robot model ──────────────────────────────────────── -->

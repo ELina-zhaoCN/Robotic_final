@@ -22,7 +22,7 @@
 <launch>
   <!-- ── Top-level arguments ──────────────────────────────── -->
   <arg name="model"      default="waffle"/>
-  <arg name="map_file"   default="$(env HOME)/maps/restaurant_map.yaml"/>
+  <arg name="map_file"   default="$(find turtlebot3_delivery)/../../../maps/restaurant_map.yaml"/>
   <arg name="open_rviz"  default="true"/>
   <arg name="bringup"    default="false"
        doc="Set true if TurtleBot3 bringup not already running"/>
