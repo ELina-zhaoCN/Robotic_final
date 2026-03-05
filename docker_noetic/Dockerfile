@@ -1,9 +1,9 @@
-# Ubuntu 20.04 + ROS Noetic，用于在 Ubuntu 22.04 主机上跑真机建图
+# Ubuntu 20.04 + ROS Noetic for real robot mapping on Ubuntu 22.04 host
 FROM ros:noetic-robot
 
 ENV TURTLEBOT3_MODEL=waffle
 
-# 安装建图和导航所需全部 ROS 包
+# Install ROS packages for mapping and navigation
 RUN apt-get update && apt-get install -y \
   ros-noetic-move-base \
   ros-noetic-amcl \
@@ -24,12 +24,12 @@ RUN apt-get update && apt-get install -y \
   ros-noetic-tf2-geometry-msgs \
   && rm -rf /var/lib/apt/lists/*
 
-# 工作空间会在运行时挂载，这里只建目录
+# Workspace will be mounted at runtime, create dir only
 RUN mkdir -p /catkin_ws/src
 
 WORKDIR /catkin_ws
 
-# 默认先 source 环境（进入容器后可直接用 roscore、roslaunch）
+# Source ROS env by default (use roscore, roslaunch directly in container)
 RUN echo "source /opt/ros/noetic/setup.bash" >> /etc/bash.bashrc
 
 CMD ["/bin/bash"]

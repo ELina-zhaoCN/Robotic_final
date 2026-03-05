@@ -1,17 +1,17 @@
 <!-- ============================================================
-     mapping_pc_only.launch — 仅在电脑上跑 gmapping + RViz（真机建图用）
-     机器人已在另一台机器上运行 turtlebot3_robot.launch，本机只做 SLAM 和显示。
+     mapping_pc_only.launch — gmapping + RViz on PC only (real robot mapping)
+     Robot runs turtlebot3_robot.launch on another machine; this PC does SLAM + display.
      
-     Usage (真机时):
-       机器人: roslaunch turtlebot3_bringup turtlebot3_robot.launch
-       本机:   roslaunch turtlebot3_delivery mapping_pc_only.launch
+     Usage (real robot):
+       Robot:  roslaunch turtlebot3_bringup turtlebot3_robot.launch
+       PC:     roslaunch turtlebot3_delivery mapping_pc_only.launch
      ============================================================ -->
 <launch>
   <arg name="model" default="waffle" doc="TurtleBot3 model: burger|waffle|waffle_pi"/>
   <param name="robot_description"
          command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro"/>
 
-  <!-- 不启动 turtlebot3_robot.launch，/scan 和 /odom 由机器人端发布 -->
+  <!-- Do not start turtlebot3_robot.launch; /scan and /odom from robot -->
 
   <node pkg="gmapping" type="slam_gmapping" name="turtlebot3_slam_gmapping"
         output="screen">

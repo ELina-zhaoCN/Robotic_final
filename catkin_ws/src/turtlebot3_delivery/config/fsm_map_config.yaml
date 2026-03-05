@@ -13,7 +13,7 @@
 # ============================================================
 
 # ── Map file path ─────────────────────────────────────────────
-# 当前地图：项目 maps/ 目录（launch 默认使用，可覆盖 map_file:=）
+# Current map: project maps/ (launch default, override with map_file:=)
 map:
   file: "maps/restaurant_map.yaml"
   frame: "map"
